@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwitchYard — Payment Orchestrator</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <h1>SwitchYard Orchestrator & Fraud Engine</h1>
+    </header>
+
+    <div class="container">
+        <!-- Panel 1: Gateway Configurations -->
+        <div class="panel" id="gateway-panel">
+            <h2>Gateway Configurations</h2>
+            <div id="gateways-container"></div>
+        </div>
+
+        <!-- Panel 2: Simulation Form -->
+        <div class="panel">
+            <h2>Payment Simulation</h2>
+            <form id="payment-form">
+                <div class="form-group row">
+                    <div>
+                        <label>Customer ID</label>
+                        <input type="text" id="customerId" value="CUST-1001" required>
+                    </div>
+                    <div>
+                        <br>
+                        <button type="button" id="btn-randomize" class="btn-secondary" style="margin-top: 5px;">Randomize ID</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Merchant</label>
+                    <input type="text" id="merchantName" value="Demo Merchant" required>
+                </div>
+                <div class="form-group">
+                    <label>Amount (INR)</label>
+                    <input type="number" id="amount" value="5000" required>
+                </div>
+                <div class="form-group">
+                    <label>Payment Method</label>
+                    <select id="paymentMethod">
+                        <option value="UPI">UPI</option>
+                        <option value="CREDIT_CARD">CREDIT_CARD</option>
+                        <option value="WALLET">WALLET</option>
+                    </select>
+                </div>
+                <div class="form-group row">
+                    <div>
+                        <label>Location</label>
+                        <input type="text" id="location" value="Mumbai" required>
+                    </div>
+                    <div>
+                        <br>
+                        <button type="button" onclick="document.getElementById('location').value='SHADOW_PROXY'" class="btn-danger" style="margin-top: 5px;">Set Shadow Proxy</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Routing Strategy</label>
+                    <select id="strategy">
+                        <option value="LOWEST_COST">Lowest Cost</option>
+                        <option value="HIGHEST_SUCCESS_RATE">Highest Success Rate</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary">Process Payment</button>
+            </form>
+        </div>
+
+        <!-- Panel 3: Results -->
+        <div class="panel">
+            <h2>Transaction Result</h2>
+            <div id="result-badges" class="badges"></div>
+            <h3>Audit Trail</h3>
+            <ul id="audit-trail" class="audit-list"></ul>
+        </div>
+        
+        <!-- Panel 4: Analytics -->
+        <div class="panel">
+            <h2>Live Analytics</h2>
+            <div class="stats">
+                <p>Total: <span id="stat-total">0</span></p>
+                <p>Settled: <span id="stat-settled">0</span></p>
+                <p>Failed: <span id="stat-failed">0</span></p>
+            </div>
+            <canvas id="analyticsChart"></canvas>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
