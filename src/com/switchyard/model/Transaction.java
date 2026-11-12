@@ -1,6 +1,5 @@
 package com.switchyard.model;
 
-import com.switchyard.state.InitiatedState;
 import com.switchyard.state.TransactionState;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,8 +34,7 @@ public class Transaction {
         this.location = location;
         this.customer = customer;
         this.merchant = merchant;
-        this.currentState = new InitiatedState();
-        addAuditLog("INITIATED", "Transaction initialized for INR " + amount + " via " + paymentMethod);
+        addAuditLog("CREATED", "Transaction object created for amount INR " + amount);
     }
 
     public void addAuditLog(String stateName, String message) {
