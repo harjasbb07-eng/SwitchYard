@@ -1,5 +1,4 @@
 package com.switchyard.model;
-
 import com.switchyard.state.InitiatedState;
 import com.switchyard.state.TransactionState;
 import java.util.ArrayList;
