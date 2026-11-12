@@ -1,0 +1,119 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #121212;
+    color: #e0e0e0;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #1e1e1e;
+    padding: 20px;
+    text-align: center;
+    border-bottom: 2px solid #03dac6;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.panel {
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.gateway-card {
+    background-color: #2c2c2c;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border-left: 4px solid #bb86fc;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group.row {
+    display: flex;
+    gap: 10px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: #bb86fc;
+}
+
+input, select {
+    width: 100%;
+    padding: 8px;
+    background-color: #333;
+    color: #fff;
+    border: 1px solid #555;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-primary { background-color: #03dac6; color: #000; width: 100%; }
+.btn-secondary { background-color: #bb86fc; color: #fff; }
+.btn-danger { background-color: #cf6679; color: #fff; }
+
+.badges span {
+    display: inline-block;
+    padding: 5px 10px;
+    margin: 5px 5px 0 0;
+    border-radius: 4px;
+    background-color: #333;
+}
+.badge-success { border: 1px solid #03dac6; color: #03dac6; }
+.badge-error { border: 1px solid #cf6679; color: #cf6679; }
+.badge-info { border: 1px solid #bb86fc; color: #bb86fc; }
+
+.audit-list {
+    list-style-type: none;
+    padding: 0;
+    font-family: monospace;
+    font-size: 0.9em;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.audit-list li {
+    padding: 8px;
+    border-bottom: 1px solid #333;
+}
+.stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+/* Fix checkbox width and alignment */
+input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    cursor: pointer;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+    color: #e0e0e0;
+}
