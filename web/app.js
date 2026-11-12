@@ -58,7 +58,7 @@ function renderGateways(gateways) {
             <label>Success Rate: <span id="sr-val-${g.name}">${g.successRate}</span>%</label>
             <input type="range" id="sr-${g.name}" min="80" max="100" step="0.1" value="${g.successRate}" onchange="updateGateway('${g.name}', document.querySelector('input[value=\\'${g.fee}\\']').value, this.value, document.getElementById('en-${g.name}').checked)">
             
-            <label style="margin-top:10px;">
+            <label class="checkbox-label">
                 <input type="checkbox" id="en-${g.name}" ${g.enabled ? 'checked' : ''} onchange="updateGateway('${g.name}', document.querySelector('input[value=\\'${g.fee}\\']').value, document.getElementById('sr-${g.name}').value, this.checked)">
                 Active / Enabled
             </label>

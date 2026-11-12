@@ -103,3 +103,17 @@ button {
     justify-content: space-between;
     margin-bottom: 15px;
 }
+/* Fix checkbox width and alignment */
+input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    cursor: pointer;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+    color: #e0e0e0;
+}
