@@ -20,11 +20,11 @@ flowchart LR
     end
 
     U --> UC1
-    UC1 -.->|includes| UC2
     U --> UC3
     U --> UC4
+    UC1 -.->|includes| UC2
     UC4 -.->|includes| UC5
-    UC5 -.->|extends| UC6
+    UC5 -.->|includes| UC6
     UC4 -.->|includes| UC7
 ```
 
@@ -56,9 +56,6 @@ classDiagram
         + selectGateway(gateways, tx) PaymentGateway
     }
 
-    class LowestCostStrategy
-    class HighestSuccessRateStrategy
-
     class PaymentGateway {
         <<interface>>
         + processPayment(tx) boolean
@@ -66,10 +63,6 @@ classDiagram
         + setEnabled(enabled)
     }
 
-    class StripeGatewayAdapter
-    class RazorpayUpiAdapter
-    class PayPalGatewayAdapter
-    
     class FraudRule {
         <<abstract>>
         # nextRule: FraudRule
@@ -86,7 +79,7 @@ classDiagram
     PaymentOrchestrator --> RoutingStrategy : Strategy Pattern
     PaymentOrchestrator --> FraudRule : Chain of Responsibility
     PaymentOrchestrator o-- PaymentGateway : Aggregation
-    PaymentOrchestrator *-- Transaction : Manages Lifecycle
+    PaymentOrchestrator o-- Transaction : Aggregation (History Tracking)
     RoutingStrategy <|.. LowestCostStrategy
     RoutingStrategy <|.. HighestSuccessRateStrategy
     PaymentGateway <|.. StripeGatewayAdapter
@@ -148,20 +141,25 @@ flowchart TD
 
 
 ## 5. OOM & Design Pattern Mapping Table
+
 The following table explicitly maps core Object-Oriented methodologies, SOLID principles, and design patterns to the SwitchYard source code.
 
 | Concept / Principle | Implementation in SwitchYard |
-|---------------------|------------------------------|
-| **Encapsulation** | `Transaction` fields (`amount`, `currentState`) are private. State changes strictly via `setState()`, and audit logs are appended via `addAuditLog()`. |
-| **Inheritance** | `AmountLimitFraudRule`, `BlacklistedLocationFraudRule`, and `VelocityCheckFraudRule` inherit the core `evaluate` execution template from the abstract `FraudRule` class. |
-| **Polymorphism** | Calling `routingStrategy.selectGateway()` dynamically invokes the logic of either `LowestCostStrategy` or `HighestSuccessRateStrategy` based on the UI dropdown selection at runtime. |
-| **Abstraction** | The `PaymentOrchestrator` interacts only with the `PaymentGateway` interface, remaining completely insulated from the underlying complexities of the mock external SDKs. |
-| **Composition** | `Transaction` strictly owns its `List<AuditEntry>`. The lifecycle of the audit logs is tied directly to the transaction; destroying the transaction destroys the logs. |
-| **Aggregation** | `Transaction` holds references to `Customer` and `Merchant` objects, which exist independently of any single transaction (a customer can have multiple transactions). |
+|---|---|
+| **Encapsulation** | `Transaction` fields are strictly private. State transitions occur securely via `setState()`, and logs are appended exclusively via `addAuditLog()`. |
+| **Inheritance** | Specific fraud rules (`AmountLimitFraudRule`, `VelocityCheckFraudRule`) extend the base `FraudRule` abstract class, inheriting its template execution flow. |
+| **Polymorphism** | Calling `routingStrategy.selectGateway()` dynamically executes logic from either `LowestCostStrategy` or `HighestSuccessRateStrategy` based on user selection. |
+| **Abstraction** | The `PaymentOrchestrator` relies entirely on the `PaymentGateway` interface, hiding the complex reality of dealing with distinct external payment SDKs. |
+| **Composition** | `Transaction` strictly owns its internal `List<AuditEntry>`. If the transaction object is garbage-collected, the audit logs are destroyed with it. |
+| **Aggregation** | `PaymentOrchestrator` aggregates `Transaction` history, and `Transaction` references `Customer`/`Merchant`. These objects are instantiated independently. |
 | **SRP (SOLID)** | Single Responsibility Principle: `FraudRule` classes only validate fraud, `RoutingStrategy` classes only evaluate gateway selection, and `TransactionState` classes only handle lifecycle transitions. |
 | **OCP (SOLID)** | Open/Closed Principle: To add a new Crypto gateway, developers create a new class implementing `PaymentGateway` and add it to the factory list without altering `PaymentOrchestrator`. |
+| **LSP / ISP (SOLID)** | Liskov Substitution Principle: Any `PaymentGateway`, `RoutingStrategy`, or `FraudRule` subclass can replace another without breaking the orchestrator. Interface Segregation Principle: Small, focused interfaces like `TransactionState` and `RoutingStrategy`. |
 | **DIP (SOLID)** | Dependency Inversion Principle: `PaymentOrchestrator` depends on abstractions (`RoutingStrategy`, `FraudRule`, `PaymentGateway`) rather than concrete classes, passed in via its constructor. |
-| **Strategy Pattern** | Allows hot-swapping between `LowestCostStrategy` and `HighestSuccessRateStrategy` in real-time via the Dashboard UI without stopping the server. |
-| **Chain of Responsibility** | `FraudChainFactory` links rules (Amount -> Location -> Velocity). If one rule throws a `FraudDetectedException`, the chain breaks and the transaction is immediately blocked. |
-| **Adapter Pattern** | Wraps incompatible third-party SDKs (`RazorpayUpiSDK`) inside standard classes (`RazorpayUpiAdapter`) that conform to the system's `PaymentGateway` contract. |
-| **State Pattern** | Manages `Transaction` transitions (`InitiatedState` -> `FraudCheckedState` -> `RoutedState` -> `SettledState`). Calling `.next()` dictates the valid directional flow. |
+| **Exception Handling** | `PaymentException` hierarchy with 4 subclasses. `PaymentOrchestrator.executeTransaction()` catches each, calls `.fail()`, and ensures `executionTimeMs` and history logging execute in the `finally` block. |
+| **Strategy Pattern** | Enables hot-swapping routing logic dynamically at runtime without restarting the server or altering the orchestrator's core code. |
+| **Chain of Responsibility** | `FraudChainFactory` sequentially links validation nodes. If any node throws an exception, the request is immediately halted and blocked. |
+| **Template Method** | `FraudRule.evaluate()` is final: it executes `check()` and inherently handles forwarding to `nextRule`. Subclasses only need to implement the specific `check()` logic. |
+| **Factory Pattern** | `GatewayFactory` and `FraudChainFactory` encapsulate the object creation logic, ensuring `ConsoleRunner` and `DashboardServer` never directly invoke concrete constructors. |
+| **Adapter Pattern** | Standardizes incompatible mock SDKs (`RazorpayUpiSDK`, `StripeExternalSDK`) behind uniform `PaymentGateway` adapter shells. |
+| **State Pattern** | Models the exact transaction lifecycle (`Initiated` -> `FraudChecked` -> `Routed` -> `Settled` / `Failed`), strictly governing directional flow. |
